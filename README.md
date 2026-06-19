@@ -2,6 +2,45 @@
 
 This is the prototype for the **Spacron User** application, built using React Native and Expo. It allows users to place requests for gigs, add multiple items to a cart, view real-time cost estimations, and specify shop locations using an interactive map interface.
 
+## 🏛 System Architecture
+
+```mermaid
+graph TD
+    subgraph Spacron User App
+        App[App Entry Point - App.js]
+        Nav[React Navigation - Bottom Tabs]
+        
+        subgraph Screens
+            NewReq[NewRequestScreen]
+            History[OrderHistoryScreen]
+            Profile[ProfileScreen]
+        end
+        
+        subgraph New Request Features
+            Cart[Itemized Cart System]
+            Pricing[Dynamic Total Calculation]
+            Map[Interactive Location Picker]
+        end
+        
+        subgraph Map Implementation
+            WebMap[Google Maps Embed iframe]
+            NativeMap[Native Map Placeholder]
+        end
+    end
+
+    App -->|Initializes Fonts & SafeArea| Nav
+    Nav -->|Tab 1| NewReq
+    Nav -->|Tab 2| History
+    Nav -->|Tab 3| Profile
+
+    NewReq --> Cart
+    NewReq --> Pricing
+    NewReq --> Map
+
+    Map -->|Web Platform| WebMap
+    Map -->|iOS/Android| NativeMap
+```
+
 ## 🚀 Features
 
 - **Itemized Cart System**: Users can add individual items (e.g., groceries, stationary, medicines) along with their estimated costs.
