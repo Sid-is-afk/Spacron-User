@@ -12,31 +12,29 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useCart } from '../context/CartContext';
 
 export default function NewRequestScreen() {
+  const { handleAddItem: addCartItem } = useCart();
   const [selectedShop, setSelectedShop] = useState('');
   const [itemName, setItemName] = useState('');
   const [itemCost, setItemCost] = useState('');
-  const [cartItems, setCartItems] = useState([]);
+  const [itemQuantity, setItemQuantity] = useState(1);
   const [category, setCategory] = useState('Grocery & Essentials');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const categories = ['Grocery & Essentials', 'Food', 'Fragile Item', 'Print out', 'Stationary', 'Medicines'];
 
   const handleAddItem = () => {
-    if (itemName.trim() && itemCost.trim()) {
-      setCartItems([...cartItems, { id: Date.now().toString(), name: itemName.trim(), cost: parseFloat(itemCost) || 0 }]);
+    if (itemName.trim() && itemCost.trim() && itemQuantity > 0 && selectedShop.trim()) {
+      addCartItem({ name: itemName.trim(), cost: parseFloat(itemCost) || 0, quantity: itemQuantity, shop: selectedShop.trim() });
       setItemName('');
       setItemCost('');
+      setItemQuantity(1);
+      setSelectedShop('');
+    } else {
+      alert('Please fill out all required fields, including the Preferred Shop.');
     }
   };
-
-  const handleRemoveItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
-
-  const totalItemCost = cartItems.reduce((sum, item) => sum + item.cost, 0);
-  const gigReward = 0;
-  const totalCost = totalItemCost + gigReward;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -90,9 +88,24 @@ export default function NewRequestScreen() {
               />
             </View>
 
-            <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
-              <Text style={styles.addButtonText}>Add to Cart</Text>
-            </TouchableOpacity>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Quantity</Text>
+              <View style={styles.stepperContainer}>
+                <TouchableOpacity
+                  style={styles.stepperButton}
+                  onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
+                >
+                  <MaterialIcons name="remove" size={20} color="#111114" />
+                </TouchableOpacity>
+                <Text style={styles.stepperValue}>{itemQuantity}</Text>
+                <TouchableOpacity
+                  style={styles.stepperButton}
+                  onPress={() => setItemQuantity(itemQuantity + 1)}
+                >
+                  <MaterialIcons name="add" size={20} color="#111114" />
+                </TouchableOpacity>
+              </View>
+            </View>
 
             <View style={styles.divider} />
 
@@ -131,6 +144,7 @@ export default function NewRequestScreen() {
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Preferred Shop</Text>
+              <Text style={styles.inputNote}>If there is no specific store then mention "Any Store".</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="e.g. Gaytri Stores"
@@ -144,12 +158,12 @@ export default function NewRequestScreen() {
               <Text style={styles.label}>Shop Location</Text>
               <View style={styles.mapContainer}>
                 {Platform.OS === 'web' ? (
-                  <iframe 
+                  <iframe
                     src="https://maps.google.com/maps?q=supermarket&t=&z=14&ie=UTF8&iwloc=&output=embed"
-                    width="100%" 
-                    height="100%" 
-                    style={{ border: 0 }} 
-                    allowFullScreen="" 
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
                     loading="lazy"
                     title="Google Maps"
                   />
@@ -169,53 +183,13 @@ export default function NewRequestScreen() {
                 <Text style={styles.mapSelectButtonText}>Set Exact Location</Text>
               </TouchableOpacity>
             </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
+              <Text style={styles.addButtonText}>Add to Cart</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Cart Card */}
-          {cartItems.length > 0 && (
-            <View style={styles.card}>
-              <Text style={styles.sectionTitle}>Cart Items</Text>
-              {cartItems.map((item) => (
-                <View key={item.id} style={styles.cartItemRow}>
-                  <View style={styles.cartItemInfo}>
-                    <Text style={styles.cartItemName}>{item.name}</Text>
-                    <Text style={styles.cartItemCost}>₹{item.cost}</Text>
-                  </View>
-                  <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
-                    <MaterialIcons name="close" size={20} color="#EF4444" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Cost Calculation Card */}
-          <View style={styles.card}>
-            <View style={styles.costRow}>
-              <Text style={styles.costLabel}>Estimated Item Cost</Text>
-              <Text style={styles.costValue}>₹{totalItemCost}</Text>
-            </View>
-            <View style={styles.costRow}>
-              <Text style={styles.costLabel}>Gig Reward</Text>
-              <View style={styles.rewardBadge}>
-                <Text style={styles.rewardBadgeText}>₹{gigReward}</Text>
-              </View>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.costRow}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>₹{totalCost}</Text>
-            </View>
-          </View>
         </ScrollView>
-
-        {/* Sticky Bottom Action Area */}
-        <View style={styles.bottomArea}>
-          <TouchableOpacity style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>Submit Request</Text>
-            <MaterialIcons name="arrow-forward" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -301,6 +275,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#111114',
     marginBottom: 8,
+  },
+  inputNote: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 12,
+    color: '#71717A',
+    marginBottom: 8,
+    marginTop: -4,
   },
   textInput: {
     fontFamily: 'PlusJakartaSans_400Regular',

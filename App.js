@@ -9,6 +9,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NewRequestScreen from './screens/NewRequestScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import CartScreen from './screens/CartScreen';
+import { CartProvider } from './context/CartContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,16 +34,19 @@ export default function App() {
 
   return (
     <SafeAreaProvider style={styles.appContainer}>
-      <NavigationContainer>
-        <Tab.Navigator
-          sceneContainerStyle={{ flex: 1, backgroundColor: '#F8F9FD' }}
+      <CartProvider>
+        <NavigationContainer>
+          <Tab.Navigator
+            sceneContainerStyle={{ flex: 1, backgroundColor: '#F8F9FD' }}
           screenOptions={({ route }) => ({
             headerShown: false,
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
 
               if (route.name === 'New Request') {
-                iconName = 'add-shopping-cart';
+                iconName = 'add-circle-outline';
+              } else if (route.name === 'Cart') {
+                iconName = 'shopping-cart';
               } else if (route.name === 'Order History') {
                 iconName = 'history';
               } else if (route.name === 'Profile') {
@@ -67,10 +72,12 @@ export default function App() {
           })}
         >
           <Tab.Screen name="New Request" component={NewRequestScreen} />
+          <Tab.Screen name="Cart" component={CartScreen} />
           <Tab.Screen name="Order History" component={OrderHistoryScreen} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
         </Tab.Navigator>
       </NavigationContainer>
+      </CartProvider>
     </SafeAreaProvider>
   );
 }
