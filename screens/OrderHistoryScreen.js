@@ -9,8 +9,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
 
 export default function OrderHistoryScreen() {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+
   const mockOrders = [
     { id: '1', date: 'Oct 12, 2023', status: 'Delivered', items: '2x Maggi, 1x Coke', total: '₹55' },
     { id: '2', date: 'Oct 10, 2023', status: 'Delivered', items: '1x Notebook, 2x Pens', total: '₹120' },
@@ -63,15 +67,15 @@ export default function OrderHistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     width: '100%',
     maxWidth: 600,
     alignSelf: 'center',
@@ -79,14 +83,14 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E4E9',
+    borderBottomColor: colors.border,
   },
   headerTitle: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 24,
-    color: '#111114',
+    color: colors.textPrimary,
   },
   scrollView: {
     flex: 1,
@@ -96,9 +100,9 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -112,34 +116,34 @@ const styles = StyleSheet.create({
   orderDate: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 14,
-    color: '#111114',
+    color: colors.textPrimary,
   },
   statusBadge: {
-    backgroundColor: '#C8F322',
+    backgroundColor: colors.success,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 9999,
   },
   statusBadgeCancelled: {
-    backgroundColor: '#FFE4E4',
+    backgroundColor: colors.dangerLight,
   },
   statusBadgeText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 12,
-    color: '#3D4D00',
+    color: colors.successText,
   },
   statusBadgeTextCancelled: {
-    color: '#D00000',
+    color: colors.dangerText,
   },
   orderItems: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
     marginBottom: 12,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E4E4E9',
+    backgroundColor: colors.border,
     marginVertical: 12,
   },
   cardFooter: {
@@ -150,11 +154,11 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
   },
   totalValue: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 18,
-    color: '#111114',
+    color: colors.textPrimary,
   },
 });

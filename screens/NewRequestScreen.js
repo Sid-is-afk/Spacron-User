@@ -13,9 +13,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function NewRequestScreen() {
   const { handleAddItem: addCartItem } = useCart();
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  
   const [selectedShop, setSelectedShop] = useState('');
   const [itemName, setItemName] = useState('');
   const [itemCost, setItemCost] = useState('');
@@ -42,7 +46,7 @@ export default function NewRequestScreen() {
         {/* Top Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.iconButton}>
-            <MaterialIcons name="menu" size={24} color="#111114" />
+            <MaterialIcons name="menu" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Spacron</Text>
           <Image
@@ -70,7 +74,7 @@ export default function NewRequestScreen() {
               <TextInput
                 style={styles.textInput}
                 placeholder="e.g. 1 packet of Maggi"
-                placeholderTextColor="#71717A"
+                placeholderTextColor={colors.textSecondary}
                 value={itemName}
                 onChangeText={setItemName}
               />
@@ -81,7 +85,7 @@ export default function NewRequestScreen() {
               <TextInput
                 style={styles.textInput}
                 placeholder="e.g. 50"
-                placeholderTextColor="#71717A"
+                placeholderTextColor={colors.textSecondary}
                 value={itemCost}
                 onChangeText={setItemCost}
                 keyboardType="numeric"
@@ -95,14 +99,14 @@ export default function NewRequestScreen() {
                   style={styles.stepperButton}
                   onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
                 >
-                  <MaterialIcons name="remove" size={20} color="#111114" />
+                  <MaterialIcons name="remove" size={20} color={colors.textPrimary} />
                 </TouchableOpacity>
                 <Text style={styles.stepperValue}>{itemQuantity}</Text>
                 <TouchableOpacity
                   style={styles.stepperButton}
                   onPress={() => setItemQuantity(itemQuantity + 1)}
                 >
-                  <MaterialIcons name="add" size={20} color="#111114" />
+                  <MaterialIcons name="add" size={20} color={colors.textPrimary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -116,7 +120,7 @@ export default function NewRequestScreen() {
                 onPress={() => setIsCategoryOpen(!isCategoryOpen)}
               >
                 <Text style={styles.dropdownText}>{category}</Text>
-                <MaterialIcons name={isCategoryOpen ? "expand-less" : "expand-more"} size={24} color="#71717A" />
+                <MaterialIcons name={isCategoryOpen ? "expand-less" : "expand-more"} size={24} color={colors.iconInactive} />
               </TouchableOpacity>
 
               {isCategoryOpen && (
@@ -148,7 +152,7 @@ export default function NewRequestScreen() {
               <TextInput
                 style={styles.textInput}
                 placeholder="e.g. Gaytri Stores"
-                placeholderTextColor="#71717A"
+                placeholderTextColor={colors.textSecondary}
                 value={selectedShop}
                 onChangeText={setSelectedShop}
               />
@@ -169,17 +173,17 @@ export default function NewRequestScreen() {
                   />
                 ) : (
                   <View style={styles.mapPlaceholder}>
-                    <MaterialIcons name="location-on" size={48} color="#E4E4E9" />
+                    <MaterialIcons name="location-on" size={48} color={colors.border} />
                     <Text style={styles.mapPlaceholderText}>Map view</Text>
                   </View>
                 )}
                 {/* Center Pin Overlay */}
                 <View style={styles.mapOverlay} pointerEvents="none">
-                  <MaterialIcons name="location-pin" size={40} color="#EF4444" style={styles.mapPin} />
+                  <MaterialIcons name="location-pin" size={40} color={colors.danger} style={styles.mapPin} />
                 </View>
               </View>
               <TouchableOpacity style={styles.mapSelectButton}>
-                <MaterialIcons name="my-location" size={20} color="#5D3EFF" />
+                <MaterialIcons name="my-location" size={20} color={colors.primary} />
                 <Text style={styles.mapSelectButtonText}>Set Exact Location</Text>
               </TouchableOpacity>
             </View>
@@ -195,16 +199,15 @@ export default function NewRequestScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FD',
-    // Bottom Tab navigator usually handles padding, but we'll leave this to prevent jumps
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     width: '100%',
     maxWidth: 600,
     alignSelf: 'center',
@@ -216,9 +219,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E4E9',
+    borderBottomColor: colors.border,
     zIndex: 10,
   },
   iconButton: {
@@ -228,21 +231,21 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 28,
-    color: '#5D3EFF',
+    color: colors.primary,
   },
   avatar: {
     width: 36,
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 100, // Space for sticky bottom action area
+    paddingBottom: 100,
   },
   titleSection: {
     marginBottom: 24,
@@ -251,18 +254,18 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 24,
-    color: '#111114',
+    color: colors.textPrimary,
     marginBottom: 4,
   },
   pageSubtitle: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -273,29 +276,29 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
-    color: '#111114',
+    color: colors.textPrimary,
     marginBottom: 8,
   },
   inputNote: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: '#71717A',
+    color: colors.textSecondary,
     marginBottom: 8,
     marginTop: -4,
   },
   textInput: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: '#111114',
-    backgroundColor: '#F8F9FD',
+    color: colors.textPrimary,
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   addButton: {
-    backgroundColor: '#E4DFFF',
+    backgroundColor: colors.primaryLight,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
@@ -304,44 +307,14 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 14,
-    color: '#5D3EFF',
-  },
-  sectionTitle: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 16,
-    color: '#111114',
-    marginBottom: 12,
-  },
-  cartItemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F4F4F5',
-  },
-  cartItemInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingRight: 16,
-  },
-  cartItemName: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 14,
-    color: '#111114',
-  },
-  cartItemCost: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 14,
-    color: '#71717A',
+    color: colors.primary,
   },
   stepperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.stepperBg,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 9999,
     alignSelf: 'flex-start',
   },
@@ -351,7 +324,7 @@ const styles = StyleSheet.create({
   stepperValue: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 16,
-    color: '#111114',
+    color: colors.textPrimary,
     paddingHorizontal: 16,
     minWidth: 40,
     textAlign: 'center',
@@ -360,9 +333,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -370,16 +343,16 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: '#111114',
+    color: colors.textPrimary,
   },
   dropdownMenu: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 12,
     marginTop: 8,
     paddingVertical: 8,
-    shadowColor: '#111114',
+    shadowColor: colors.textPrimary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -392,106 +365,16 @@ const styles = StyleSheet.create({
   dropdownMenuItemText: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
   },
   dropdownMenuItemTextActive: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
-    color: '#5D3EFF',
-  },
-  shopScrollContent: {
-    gap: 8,
-  },
-  shopPill: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 9999,
-    borderWidth: 1,
-    borderColor: '#E4E4E9',
-    backgroundColor: '#FFFFFF',
-  },
-  shopPillActive: {
-    backgroundColor: '#E4DFFF',
-    borderColor: '#5D3EFF',
-  },
-  shopPillText: {
-    fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 14,
-    color: '#71717A',
-  },
-  shopPillTextActive: {
-    color: '#3D00DD',
-  },
-  costRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  costLabel: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 14,
-    color: '#71717A',
-  },
-  costValue: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 14,
-    color: '#111114',
-  },
-  rewardBadge: {
-    backgroundColor: '#C8F322',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 9999,
-  },
-  rewardBadgeText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 12,
-    color: '#3D4D00',
+    color: colors.primary,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E4E4E9',
+    backgroundColor: colors.border,
     marginVertical: 16,
-  },
-  totalLabel: {
-    fontFamily: 'PlusJakartaSans_700Bold',
-    fontSize: 18,
-    color: '#111114',
-  },
-  totalValue: {
-    fontFamily: 'SpaceGrotesk_700Bold',
-    fontSize: 32,
-    color: '#111114',
-  },
-  bottomArea: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    paddingBottom: Platform.OS === 'ios' ? 32 : 16,
-    backgroundColor: 'rgba(248, 249, 253, 0.9)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(228, 228, 233, 0.5)',
-  },
-  submitButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#5D3EFF',
-    height: 56,
-    borderRadius: 12,
-    gap: 8,
-    shadowColor: '#5D3EFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  submitButtonText: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 16,
-    color: '#FFFFFF',
   },
   mapContainer: {
     height: 200,
@@ -499,8 +382,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E4E4E9',
-    backgroundColor: '#F4F4F5',
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceAlt,
     position: 'relative',
     marginBottom: 12,
   },
@@ -512,7 +395,7 @@ const styles = StyleSheet.create({
   mapPlaceholderText: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
     marginTop: 8,
   },
   mapSelectButton: {
@@ -521,15 +404,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#E4DFFF',
-    backgroundColor: '#F8F6FF',
+    borderColor: colors.primaryLight,
+    backgroundColor: colors.primarySuperLight,
     borderRadius: 12,
     gap: 8,
   },
   mapSelectButtonText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 14,
-    color: '#5D3EFF',
+    color: colors.primary,
   },
   mapOverlay: {
     position: 'absolute',

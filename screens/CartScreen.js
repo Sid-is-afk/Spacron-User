@@ -11,9 +11,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function CartScreen() {
   const { cartItems, handleRemoveItem, updateItemQuantity, totalItemCost } = useCart();
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   
   const gigReward = 0;
   const totalCost = totalItemCost + gigReward;
@@ -52,20 +55,20 @@ export default function CartScreen() {
                           style={styles.stepperButton}
                           onPress={() => updateItemQuantity(item.id, (item.quantity || 1) - 1)}
                         >
-                          <MaterialIcons name="remove" size={16} color="#111114" />
+                          <MaterialIcons name="remove" size={16} color={colors.textPrimary} />
                         </TouchableOpacity>
                         <Text style={styles.stepperValue}>{item.quantity || 1}</Text>
                         <TouchableOpacity
                           style={styles.stepperButton}
                           onPress={() => updateItemQuantity(item.id, (item.quantity || 1) + 1)}
                         >
-                          <MaterialIcons name="add" size={16} color="#111114" />
+                          <MaterialIcons name="add" size={16} color={colors.textPrimary} />
                         </TouchableOpacity>
                       </View>
 
                       {/* Remove Button */}
                       <TouchableOpacity onPress={() => handleRemoveItem(item.id)} style={styles.removeButton}>
-                        <MaterialIcons name="delete" size={20} color="#EF4444" />
+                        <MaterialIcons name="delete" size={20} color={colors.danger} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -93,7 +96,7 @@ export default function CartScreen() {
             </>
           ) : (
             <View style={styles.emptyContainer}>
-              <MaterialIcons name="shopping-cart" size={64} color="#E4E4E9" />
+              <MaterialIcons name="shopping-cart" size={64} color={colors.border} />
               <Text style={styles.emptyTitle}>Your cart is empty</Text>
               <Text style={styles.emptySubtitle}>Items you add will appear here.</Text>
             </View>
@@ -114,15 +117,15 @@ export default function CartScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     width: '100%',
     maxWidth: 600,
     alignSelf: 'center',
@@ -134,15 +137,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E4E9',
+    borderBottomColor: colors.border,
     zIndex: 10,
   },
   headerTitle: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 24,
-    color: '#111114',
+    color: colors.textPrimary,
   },
   scrollView: {
     flex: 1,
@@ -152,9 +155,9 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Space for sticky bottom action area
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -162,7 +165,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 16,
-    color: '#111114',
+    color: colors.textPrimary,
     marginBottom: 12,
   },
   cartItemRow: {
@@ -171,7 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F4F4F5',
+    borderBottomColor: colors.surfaceAlt,
   },
   cartItemInfo: {
     flex: 1,
@@ -180,19 +183,19 @@ const styles = StyleSheet.create({
   cartItemName: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
-    color: '#111114',
+    color: colors.textPrimary,
     marginBottom: 2,
   },
   cartItemShop: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 12,
-    color: '#71717A',
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   cartItemCost: {
     fontFamily: 'PlusJakartaSans_500Medium',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
   },
   actionContainer: {
     flexDirection: 'row',
@@ -202,9 +205,9 @@ const styles = StyleSheet.create({
   stepperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F9FD',
+    backgroundColor: colors.stepperBg,
     borderWidth: 1,
-    borderColor: '#E4E4E9',
+    borderColor: colors.border,
     borderRadius: 9999,
   },
   stepperButton: {
@@ -213,7 +216,7 @@ const styles = StyleSheet.create({
   stepperValue: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 14,
-    color: '#111114',
+    color: colors.textPrimary,
     paddingHorizontal: 8,
     minWidth: 24,
     textAlign: 'center',
@@ -230,15 +233,15 @@ const styles = StyleSheet.create({
   costLabel: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
   },
   costValue: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 14,
-    color: '#111114',
+    color: colors.textPrimary,
   },
   rewardBadge: {
-    backgroundColor: '#C8F322',
+    backgroundColor: colors.success,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 9999,
@@ -246,22 +249,22 @@ const styles = StyleSheet.create({
   rewardBadgeText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
     fontSize: 12,
-    color: '#3D4D00',
+    color: colors.successText,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E4E4E9',
+    backgroundColor: colors.border,
     marginVertical: 16,
   },
   totalLabel: {
     fontFamily: 'PlusJakartaSans_700Bold',
     fontSize: 18,
-    color: '#111114',
+    color: colors.textPrimary,
   },
   totalValue: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 32,
-    color: '#111114',
+    color: colors.textPrimary,
   },
   bottomArea: {
     position: 'absolute',
@@ -270,19 +273,19 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 16,
     paddingBottom: Platform.OS === 'ios' ? 32 : 16,
-    backgroundColor: 'rgba(248, 249, 253, 0.9)',
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(228, 228, 233, 0.5)',
+    borderTopColor: colors.border,
   },
   submitButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#5D3EFF',
+    backgroundColor: colors.primary,
     height: 56,
     borderRadius: 12,
     gap: 8,
-    shadowColor: '#5D3EFF',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
@@ -301,14 +304,14 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 20,
-    color: '#111114',
+    color: colors.textPrimary,
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontFamily: 'PlusJakartaSans_400Regular',
     fontSize: 14,
-    color: '#71717A',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
 });

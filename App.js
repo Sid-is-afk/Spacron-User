@@ -11,8 +11,57 @@ import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import CartScreen from './screens/CartScreen';
 import { CartProvider } from './context/CartContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 const Tab = createBottomTabNavigator();
+
+const TabNavigator = () => {
+  const { colors } = useTheme();
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        sceneContainerStyle={{ flex: 1, backgroundColor: colors.background }}
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'New Request') {
+              iconName = 'add-circle-outline';
+            } else if (route.name === 'Cart') {
+              iconName = 'shopping-cart';
+            } else if (route.name === 'Order History') {
+              iconName = 'history';
+            } else if (route.name === 'Profile') {
+              iconName = 'person';
+            }
+
+            return <MaterialIcons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.iconInactive,
+          tabBarStyle: {
+            backgroundColor: colors.surface,
+            borderTopWidth: 1,
+            borderTopColor: colors.border,
+            paddingBottom: 4,
+            paddingTop: 4,
+            height: 60,
+          },
+          tabBarLabelStyle: {
+            fontFamily: 'PlusJakartaSans_500Medium',
+            fontSize: 12,
+          },
+        })}
+      >
+        <Tab.Screen name="New Request" component={NewRequestScreen} />
+        <Tab.Screen name="Cart" component={CartScreen} />
+        <Tab.Screen name="Order History" component={OrderHistoryScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+};
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -34,50 +83,11 @@ export default function App() {
 
   return (
     <SafeAreaProvider style={styles.appContainer}>
-      <CartProvider>
-        <NavigationContainer>
-          <Tab.Navigator
-            sceneContainerStyle={{ flex: 1, backgroundColor: '#F8F9FD' }}
-          screenOptions={({ route }) => ({
-            headerShown: false,
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconName;
-
-              if (route.name === 'New Request') {
-                iconName = 'add-circle-outline';
-              } else if (route.name === 'Cart') {
-                iconName = 'shopping-cart';
-              } else if (route.name === 'Order History') {
-                iconName = 'history';
-              } else if (route.name === 'Profile') {
-                iconName = 'person';
-              }
-
-              return <MaterialIcons name={iconName} size={size} color={color} />;
-            },
-            tabBarActiveTintColor: '#5D3EFF',
-            tabBarInactiveTintColor: '#71717A',
-            tabBarStyle: {
-              backgroundColor: '#FFFFFF',
-              borderTopWidth: 1,
-              borderTopColor: '#E4E4E9',
-              paddingBottom: 4,
-              paddingTop: 4,
-              height: 60,
-            },
-            tabBarLabelStyle: {
-              fontFamily: 'PlusJakartaSans_500Medium',
-              fontSize: 12,
-            },
-          })}
-        >
-          <Tab.Screen name="New Request" component={NewRequestScreen} />
-          <Tab.Screen name="Cart" component={CartScreen} />
-          <Tab.Screen name="Order History" component={OrderHistoryScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
-        </Tab.Navigator>
-      </NavigationContainer>
-      </CartProvider>
+      <ThemeProvider>
+        <CartProvider>
+          <TabNavigator />
+        </CartProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
