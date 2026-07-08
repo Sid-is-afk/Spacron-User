@@ -12,31 +12,48 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 
-export default function NewRequestScreen() {
+export default function PrintsScreen() {
   const { handleAddItem: addCartItem } = useCart();
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
   const [selectedShop, setSelectedShop] = useState('');
-  const [itemName, setItemName] = useState('');
-  const [itemCost, setItemCost] = useState('');
   const [itemQuantity, setItemQuantity] = useState(1);
-  const [category, setCategory] = useState('Grocery & Essentials');
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const categories = ['Grocery & Essentials', 'Food', 'Fragile Item', 'Stationary', 'Medicines'];
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setSelectedFile(result.assets[0]);
+      }
+    } catch (err) {
+      console.log('Error picking document', err);
+    }
+  };
 
   const handleAddItem = () => {
-    if (itemName.trim() && itemCost.trim() && itemQuantity > 0 && selectedShop.trim()) {
-      addCartItem({ name: itemName.trim(), cost: parseFloat(itemCost) || 0, quantity: itemQuantity, shop: selectedShop.trim() });
-      setItemName('');
-      setItemCost('');
+    if (selectedFile && itemQuantity > 0 && selectedShop.trim()) {
+      addCartItem({
+        name: selectedFile.name,
+        cost: 0,
+        quantity: itemQuantity,
+        shop: selectedShop.trim(),
+        category: 'Printout'
+      });
+      setSelectedFile(null);
       setItemQuantity(1);
       setSelectedShop('');
     } else {
-      alert('Please fill out all required fields, including the Preferred Shop.');
+      alert('Please fill out all required fields, including uploading a document and Preferred Shop.');
     }
   };
 
@@ -63,37 +80,26 @@ export default function NewRequestScreen() {
         >
           {/* Screen Title */}
           <View style={styles.titleSection}>
-            <Text style={styles.pageTitle}>New Request</Text>
-            <Text style={styles.pageSubtitle}>Fill out the details for your gig.</Text>
+            <Text style={styles.pageTitle}>Print Request</Text>
+            <Text style={styles.pageSubtitle}>Upload a document and request a printout.</Text>
           </View>
 
           {/* Input Card */}
           <View style={styles.card}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Item Name</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="e.g. 1 packet of Maggi"
-                placeholderTextColor={colors.textSecondary}
-                value={itemName}
-                onChangeText={setItemName}
-              />
+              <Text style={styles.label}>Document</Text>
+              <TouchableOpacity style={styles.uploadButton} onPress={pickDocument}>
+                <MaterialIcons name="upload-file" size={24} color={colors.primary} />
+                <Text style={styles.uploadButtonText}>
+                  {selectedFile ? selectedFile.name : 'Select a document to print'}
+                </Text>
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Estimated Cost (₹)</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="e.g. 50"
-                placeholderTextColor={colors.textSecondary}
-                value={itemCost}
-                onChangeText={setItemCost}
-                keyboardType="numeric"
-              />
-            </View>
+
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Quantity</Text>
+              <Text style={styles.label}>Number of Copies</Text>
               <View style={styles.stepperContainer}>
                 <TouchableOpacity
                   style={styles.stepperButton}
@@ -112,39 +118,6 @@ export default function NewRequestScreen() {
             </View>
 
             <View style={styles.divider} />
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Category</Text>
-              <TouchableOpacity
-                style={styles.dropdownButton}
-                onPress={() => setIsCategoryOpen(!isCategoryOpen)}
-              >
-                <Text style={styles.dropdownText}>{category}</Text>
-                <MaterialIcons name={isCategoryOpen ? "expand-less" : "expand-more"} size={24} color={colors.iconInactive} />
-              </TouchableOpacity>
-
-              {isCategoryOpen && (
-                <View style={styles.dropdownMenu}>
-                  {categories.map((item) => (
-                    <TouchableOpacity
-                      key={item}
-                      style={styles.dropdownMenuItem}
-                      onPress={() => {
-                        setCategory(item);
-                        setIsCategoryOpen(false);
-                      }}
-                    >
-                      <Text style={[
-                        styles.dropdownMenuItemText,
-                        category === item && styles.dropdownMenuItemTextActive
-                      ]}>
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Preferred Shop</Text>
@@ -297,6 +270,23 @@ const createStyles = (colors) => StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
+  uploadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 12,
+  },
+  uploadButtonText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: colors.textPrimary,
+    flex: 1,
+  },
   addButton: {
     backgroundColor: colors.primaryLight,
     paddingVertical: 14,
@@ -328,48 +318,6 @@ const createStyles = (colors) => StyleSheet.create({
     paddingHorizontal: 16,
     minWidth: 40,
     textAlign: 'center',
-  },
-  dropdownButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  dropdownText: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 14,
-    color: colors.textPrimary,
-  },
-  dropdownMenu: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    marginTop: 8,
-    paddingVertical: 8,
-    shadowColor: colors.textPrimary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  dropdownMenuItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  dropdownMenuItemText: {
-    fontFamily: 'PlusJakartaSans_400Regular',
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  dropdownMenuItemTextActive: {
-    fontFamily: 'PlusJakartaSans_600SemiBold',
-    color: colors.primary,
   },
   divider: {
     height: 1,

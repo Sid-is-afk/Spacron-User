@@ -10,6 +10,7 @@ import NewRequestScreen from './screens/NewRequestScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import CartScreen from './screens/CartScreen';
+import PrintsScreen from './screens/PrintsScreen';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
@@ -28,6 +29,8 @@ const TabNavigator = () => {
 
             if (route.name === 'New Request') {
               iconName = 'add-circle-outline';
+            } else if (route.name === 'Prints') {
+              iconName = 'print';
             } else if (route.name === 'Cart') {
               iconName = 'shopping-cart';
             } else if (route.name === 'Order History') {
@@ -55,6 +58,7 @@ const TabNavigator = () => {
         })}
       >
         <Tab.Screen name="New Request" component={NewRequestScreen} />
+        <Tab.Screen name="Prints" component={PrintsScreen} />
         <Tab.Screen name="Cart" component={CartScreen} />
         <Tab.Screen name="Order History" component={OrderHistoryScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />

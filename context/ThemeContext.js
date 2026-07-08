@@ -47,7 +47,7 @@ export const useTheme = () => {
 
 export const ThemeProvider = ({ children }) => {
   const systemTheme = useColorScheme();
-  const [theme, setTheme] = useState(systemTheme || 'light');
+  const [theme, setTheme] = useState('light');
 
   const toggleTheme = (newTheme) => {
     setTheme(newTheme);
