@@ -88,6 +88,7 @@ export default function PrintsScreen() {
           <View style={styles.card}>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Document</Text>
+              <Text style={styles.pageSubtitle}>Do not upload more than 5 documents at a time.</Text>
               <TouchableOpacity style={styles.uploadButton} onPress={pickDocument}>
                 <MaterialIcons name="upload-file" size={24} color={colors.primary} />
                 <Text style={styles.uploadButtonText}>
