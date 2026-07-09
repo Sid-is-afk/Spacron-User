@@ -66,10 +66,9 @@ export default function PrintsScreen() {
             <MaterialIcons name="menu" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Spacron</Text>
-          <Image
-            source={{ uri: 'https://i.pravatar.cc/100?img=12' }}
-            style={styles.avatar}
-          />
+          <View style={styles.avatar}>
+            <MaterialIcons name="person" size={24} color={colors.textSecondary} />
+          </View>
         </View>
 
         {/* Scrollable Content Area */}
@@ -213,6 +212,9 @@ const createStyles = (colors) => StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceAlt,
   },
   scrollView: {
     flex: 1,

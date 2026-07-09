@@ -15,11 +15,7 @@ export default function OrderHistoryScreen() {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
-  const mockOrders = [
-    { id: '1', date: 'Oct 12, 2023', status: 'Delivered', items: '2x Maggi, 1x Coke', total: '₹55' },
-    { id: '2', date: 'Oct 10, 2023', status: 'Delivered', items: '1x Notebook, 2x Pens', total: '₹120' },
-    { id: '3', date: 'Oct 05, 2023', status: 'Cancelled', items: '3x Lays', total: '₹60' },
-  ];
+  const mockOrders = [];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -34,33 +30,41 @@ export default function OrderHistoryScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {mockOrders.map((order) => (
-            <View key={order.id} style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.orderDate}>{order.date}</Text>
-                <View style={[
-                  styles.statusBadge, 
-                  order.status === 'Cancelled' ? styles.statusBadgeCancelled : null
-                ]}>
-                  <Text style={[
-                    styles.statusBadgeText,
-                    order.status === 'Cancelled' ? styles.statusBadgeTextCancelled : null
+          {mockOrders.length > 0 ? (
+            mockOrders.map((order) => (
+              <View key={order.id} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.orderDate}>{order.date}</Text>
+                  <View style={[
+                    styles.statusBadge, 
+                    order.status === 'Cancelled' ? styles.statusBadgeCancelled : null
                   ]}>
-                    {order.status}
-                  </Text>
+                    <Text style={[
+                      styles.statusBadgeText,
+                      order.status === 'Cancelled' ? styles.statusBadgeTextCancelled : null
+                    ]}>
+                      {order.status}
+                    </Text>
+                  </View>
+                </View>
+                
+                <Text style={styles.orderItems}>{order.items}</Text>
+                
+                <View style={styles.divider} />
+                
+                <View style={styles.cardFooter}>
+                  <Text style={styles.totalLabel}>Total</Text>
+                  <Text style={styles.totalValue}>{order.total}</Text>
                 </View>
               </View>
-              
-              <Text style={styles.orderItems}>{order.items}</Text>
-              
-              <View style={styles.divider} />
-              
-              <View style={styles.cardFooter}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>{order.total}</Text>
-              </View>
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <MaterialIcons name="history" size={64} color={colors.border} />
+              <Text style={styles.emptyTitle}>No order history</Text>
+              <Text style={styles.emptySubtitle}>You haven't placed any orders yet.</Text>
             </View>
-          ))}
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -160,5 +164,23 @@ const createStyles = (colors) => StyleSheet.create({
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 18,
     color: colors.textPrimary,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 64,
+  },
+  emptyTitle: {
+    fontFamily: 'SpaceGrotesk_700Bold',
+    fontSize: 20,
+    color: colors.textPrimary,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
 });
