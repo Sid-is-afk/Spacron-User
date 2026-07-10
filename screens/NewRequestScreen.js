@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,9 +9,14 @@ import {
   Image,
   Platform,
   StatusBar,
+  Animated,
+  PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { BlurView } from 'expo-blur';
+import LottieView from 'lottie-react-native';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -28,13 +33,82 @@ export default function NewRequestScreen() {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const categories = ['Grocery & Essentials', 'Food', 'Fragile Item', 'Stationary', 'Medicines'];
 
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const pulseAnim = useRef(new Animated.Value(0.3)).current;
+  const [itemImage, setItemImage] = useState(null);
+  const [showSuccessAnim, setShowSuccessAnim] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  const pan = useRef(new Animated.ValueXY()).current;
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: () => {
+        pan.extractOffset();
+      },
+    })
+  ).current;
+
+  useEffect(() => {
+    if (!isMapLoaded) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 0.7,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 0.3,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }
+  }, [isMapLoaded]);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setItemImage(result.assets[0].uri);
+    }
+  };
+
+  const simulateVoiceToText = () => {
+    setIsListening(true);
+    setTimeout(() => {
+      setItemName("1 packet of Maggi");
+      setIsListening(false);
+    }, 2000);
+  };
+
   const handleAddItem = () => {
     if (itemName.trim() && itemCost.trim() && itemQuantity > 0 && selectedShop.trim()) {
-      addCartItem({ name: itemName.trim(), cost: parseFloat(itemCost) || 0, quantity: itemQuantity, shop: selectedShop.trim() });
+      addCartItem({ 
+        name: itemName.trim(), 
+        cost: parseFloat(itemCost) || 0, 
+        quantity: itemQuantity, 
+        shop: selectedShop.trim(),
+        image: itemImage 
+      });
       setItemName('');
       setItemCost('');
       setItemQuantity(1);
       setSelectedShop('');
+      setItemImage(null);
+      
+      setShowSuccessAnim(true);
+      setTimeout(() => setShowSuccessAnim(false), 2500);
     } else {
       alert('Please fill out all required fields, including the Preferred Shop.');
     }
@@ -70,13 +144,22 @@ export default function NewRequestScreen() {
           <View style={styles.card}>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Item Name</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="e.g. 1 packet of Maggi"
-                placeholderTextColor={colors.textSecondary}
-                value={itemName}
-                onChangeText={setItemName}
-              />
+              <View style={styles.textInputWithIcon}>
+                <TextInput
+                  style={[styles.textInput, { flex: 1, borderWidth: 0 }]}
+                  placeholder={isListening ? "Listening..." : "e.g. 1 packet of Maggi"}
+                  placeholderTextColor={isListening ? colors.primary : colors.textSecondary}
+                  value={itemName}
+                  onChangeText={setItemName}
+                />
+                <TouchableOpacity onPress={simulateVoiceToText} style={styles.micButton}>
+                  <MaterialIcons 
+                    name="mic" 
+                    size={24} 
+                    color={isListening ? colors.danger : colors.textSecondary} 
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.inputGroup}>
@@ -145,6 +228,27 @@ export default function NewRequestScreen() {
               )}
             </View>
 
+            {category === 'Medicines' && (
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Prescription / Medicine Photo</Text>
+                <TouchableOpacity style={styles.imagePickerButton} onPress={pickImage}>
+                  {itemImage ? (
+                    <Image source={{ uri: itemImage }} style={styles.previewImage} />
+                  ) : (
+                    <>
+                      <MaterialIcons name="camera-alt" size={28} color={colors.primary} />
+                      <Text style={styles.imagePickerText}>Tap to attach a photo</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+                {itemImage && (
+                  <TouchableOpacity style={styles.removeImageButton} onPress={() => setItemImage(null)}>
+                    <Text style={styles.removeImageText}>Remove Photo</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Preferred Shop</Text>
               <Text style={styles.inputNote}>If there is no specific store then mention "Any Store".</Text>
@@ -160,15 +264,19 @@ export default function NewRequestScreen() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Shop Location</Text>
               <View style={styles.mapContainer}>
+                {!isMapLoaded && Platform.OS === 'web' && (
+                  <Animated.View style={[styles.skeletonLoader, { opacity: pulseAnim }]} />
+                )}
                 {Platform.OS === 'web' ? (
                   <iframe
                     src="https://maps.google.com/maps?q=supermarket&t=&z=14&ie=UTF8&iwloc=&output=embed"
                     width="100%"
                     height="100%"
-                    style={{ border: 0 }}
+                    style={{ border: 0, opacity: isMapLoaded ? 1 : 0, position: isMapLoaded ? 'relative' : 'absolute' }}
                     allowFullScreen=""
                     loading="lazy"
                     title="Google Maps"
+                    onLoad={() => setIsMapLoaded(true)}
                   />
                 ) : (
                   <View style={styles.mapPlaceholder}>
@@ -176,23 +284,44 @@ export default function NewRequestScreen() {
                     <Text style={styles.mapPlaceholderText}>Map view</Text>
                   </View>
                 )}
-                {/* Center Pin Overlay */}
-                <View style={styles.mapOverlay} pointerEvents="none">
+                {/* Center Pin Overlay (Draggable) */}
+                <Animated.View 
+                  style={[
+                    styles.mapOverlay, 
+                    { transform: [{ translateX: pan.x }, { translateY: pan.y }] },
+                    { opacity: isMapLoaded || Platform.OS !== 'web' ? 1 : 0 }
+                  ]} 
+                  {...panResponder.panHandlers}
+                >
                   <MaterialIcons name="location-pin" size={40} color={colors.danger} style={styles.mapPin} />
-                </View>
+                </Animated.View>
               </View>
               <TouchableOpacity style={styles.mapSelectButton}>
                 <MaterialIcons name="my-location" size={20} color={colors.primary} />
                 <Text style={styles.mapSelectButtonText}>Set Exact Location</Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
-              <Text style={styles.addButtonText}>Add to Cart</Text>
-            </TouchableOpacity>
           </View>
-
         </ScrollView>
+
+        {/* Floating Glassmorphic Add Button */}
+        <BlurView intensity={80} tint="light" style={styles.floatingGlassContainer}>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
+            <Text style={styles.addButtonText}>Add to Cart</Text>
+          </TouchableOpacity>
+        </BlurView>
+
+        {/* Lottie Success Animation Overlay */}
+        {showSuccessAnim && (
+          <View style={styles.lottieOverlay}>
+            <LottieView
+              source={require('../assets/success.json')}
+              autoPlay
+              loop={false}
+              style={styles.lottieAnimation}
+            />
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -247,7 +376,7 @@ const createStyles = (colors) => StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 120, // Increased padding for floating button
   },
   titleSection: {
     marginBottom: 24,
@@ -299,17 +428,53 @@ const createStyles = (colors) => StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  addButton: {
-    backgroundColor: colors.primaryLight,
-    paddingVertical: 14,
-    borderRadius: 12,
+  textInputWithIcon: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+  },
+  micButton: {
+    padding: 12,
+  },
+  quickAddChipText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  floatingGlassContainer: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 24 : 16,
+    left: 16,
+    right: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  addButton: {
+    backgroundColor: 'rgba(76, 175, 80, 0.85)', // Slight transparency for the button itself
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addButtonText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 14,
-    color: colors.primary,
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  lottieOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
+  },
+  lottieAnimation: {
+    width: 200,
+    height: 200,
   },
   stepperContainer: {
     flexDirection: 'row',
@@ -378,6 +543,39 @@ const createStyles = (colors) => StyleSheet.create({
     backgroundColor: colors.border,
     marginVertical: 16,
   },
+  imagePickerButton: {
+    height: 120,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceAlt,
+    overflow: 'hidden',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  imagePickerText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 14,
+    color: colors.primary,
+    marginTop: 8,
+  },
+  removeImageButton: {
+    alignSelf: 'flex-start',
+    marginTop: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  removeImageText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 14,
+    color: colors.danger,
+  },
   mapContainer: {
     height: 200,
     width: '100%',
@@ -388,6 +586,11 @@ const createStyles = (colors) => StyleSheet.create({
     backgroundColor: colors.surfaceAlt,
     position: 'relative',
     marginBottom: 12,
+  },
+  skeletonLoader: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.border,
+    zIndex: 1,
   },
   mapPlaceholder: {
     flex: 1,

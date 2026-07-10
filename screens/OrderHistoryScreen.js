@@ -6,6 +6,8 @@ import {
   ScrollView,
   Platform,
   StatusBar,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -15,7 +17,34 @@ export default function OrderHistoryScreen() {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
-  const mockOrders = [];
+  const mockOrders = [
+    {
+      id: '1',
+      date: '10 July 2026, 14:30',
+      status: 'On the Way',
+      items: '1x Milk, 2x Bread',
+      total: '₹120',
+      timelineIndex: 3,
+    },
+    {
+      id: '2',
+      date: '08 July 2026, 10:15',
+      status: 'Delivered',
+      items: '1x Paracetamol, 1x Water Bottle',
+      total: '₹80',
+      timelineIndex: 4,
+    }
+  ];
+
+  const timelineSteps = ['Placed', 'Accepted', 'Shopping', 'On the Way', 'Delivered'];
+
+  const handleReorder = (items) => {
+    if (Platform.OS === 'web') {
+      window.alert(`Simulating reorder: Added ${items} to cart!`);
+    } else {
+      Alert.alert("Reorder", `Added ${items} to cart!`);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -50,11 +79,42 @@ export default function OrderHistoryScreen() {
                 
                 <Text style={styles.orderItems}>{order.items}</Text>
                 
+                {/* Visual Status Timeline */}
+                <View style={styles.timelineContainer}>
+                  {timelineSteps.map((step, index) => (
+                    <View key={step} style={styles.timelineStep}>
+                      <View style={[
+                        styles.timelineDot,
+                        index <= order.timelineIndex ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
+                      ]} />
+                      {index < timelineSteps.length - 1 && (
+                        <View style={[
+                          styles.timelineLine,
+                          index < order.timelineIndex ? { backgroundColor: colors.primary } : { backgroundColor: colors.border }
+                        ]} />
+                      )}
+                      <Text style={[
+                        styles.timelineText,
+                        index <= order.timelineIndex ? { color: colors.textPrimary } : { color: colors.textSecondary }
+                      ]}>{step}</Text>
+                    </View>
+                  ))}
+                </View>
+
                 <View style={styles.divider} />
                 
                 <View style={styles.cardFooter}>
-                  <Text style={styles.totalLabel}>Total</Text>
-                  <Text style={styles.totalValue}>{order.total}</Text>
+                  <View>
+                    <Text style={styles.totalLabel}>Total</Text>
+                    <Text style={styles.totalValue}>{order.total}</Text>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.reorderButton}
+                    onPress={() => handleReorder(order.items)}
+                  >
+                    <MaterialIcons name="refresh" size={16} color={colors.primary} />
+                    <Text style={styles.reorderButtonText}>Reorder</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))
@@ -182,5 +242,53 @@ const createStyles = (colors) => StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  timelineContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  timelineStep: {
+    alignItems: 'center',
+    flex: 1,
+    position: 'relative',
+  },
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    zIndex: 2,
+  },
+  timelineLine: {
+    position: 'absolute',
+    top: 5,
+    left: '50%',
+    right: '-50%',
+    height: 2,
+    zIndex: 1,
+  },
+  timelineText: {
+    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: 10,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  reorderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: colors.primarySuperLight,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+  },
+  reorderButtonText: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    fontSize: 14,
+    color: colors.primary,
+    marginLeft: 4,
   },
 });
