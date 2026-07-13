@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
+import LottieView from 'lottie-react-native';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -27,6 +28,7 @@ export default function PrintsScreen() {
   const [printType, setPrintType] = useState('Black & White');
   const [isPrintTypeOpen, setIsPrintTypeOpen] = useState(false);
   const [instructions, setInstructions] = useState('');
+  const [showSuccessAnim, setShowSuccessAnim] = useState(false);
 
   const pickDocument = async () => {
     try {
@@ -59,6 +61,9 @@ export default function PrintsScreen() {
       setSelectedShop('');
       setPrintType('Black & White');
       setInstructions('');
+      
+      setShowSuccessAnim(true);
+      setTimeout(() => setShowSuccessAnim(false), 2500);
     } else {
       alert('Please fill out all required fields, including uploading a document and Preferred Shop.');
     }
@@ -222,6 +227,18 @@ export default function PrintsScreen() {
           </View>
 
         </ScrollView>
+
+        {/* Lottie Success Animation Overlay */}
+        {showSuccessAnim && (
+          <View style={styles.lottieOverlay}>
+            <LottieView
+              source={require('../assets/success.json')}
+              autoPlay
+              loop={false}
+              style={styles.lottieAnimation}
+            />
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -473,5 +490,16 @@ const createStyles = (colors) => StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
+  },
+  lottieOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
+  },
+  lottieAnimation: {
+    width: 200,
+    height: 200,
   },
 });
