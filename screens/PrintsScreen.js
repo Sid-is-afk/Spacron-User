@@ -74,9 +74,6 @@ export default function PrintsScreen() {
       <View style={styles.container}>
         {/* Top Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.iconButton}>
-            <MaterialIcons name="menu" size={24} color={colors.textPrimary} />
-          </TouchableOpacity>
           <Text style={styles.headerTitle}>Spacron</Text>
           <View style={styles.avatar}>
             <MaterialIcons name="person" size={24} color={colors.textSecondary} />

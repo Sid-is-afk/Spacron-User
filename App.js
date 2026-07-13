@@ -57,10 +57,10 @@ const TabNavigator = () => {
           },
         })}
       >
-        <Tab.Screen name="New Request" component={NewRequestScreen} />
+        <Tab.Screen name="New Request" component={NewRequestScreen} options={{ tabBarLabel: 'Requests' }} />
         <Tab.Screen name="Prints" component={PrintsScreen} />
         <Tab.Screen name="Cart" component={CartScreen} />
-        <Tab.Screen name="Order History" component={OrderHistoryScreen} />
+        <Tab.Screen name="Order History" component={OrderHistoryScreen} options={{ tabBarLabel: 'History' }} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>
