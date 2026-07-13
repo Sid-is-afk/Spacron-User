@@ -24,6 +24,7 @@ export default function NewRequestScreen() {
   const { handleAddItem: addCartItem } = useCart();
   const { colors } = useTheme();
   const styles = createStyles(colors);
+  const scrollViewRef = useRef(null);
 
   const [selectedShop, setSelectedShop] = useState('');
   const [itemName, setItemName] = useState('');
@@ -32,6 +33,7 @@ export default function NewRequestScreen() {
   const [category, setCategory] = useState('Grocery & Essentials');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const categories = ['Grocery & Essentials', 'Food', 'Fragile Item', 'Stationary', 'Medicines'];
+  const [instructions, setInstructions] = useState('');
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const pulseAnim = useRef(new Animated.Value(0.3)).current;
@@ -110,13 +112,20 @@ export default function NewRequestScreen() {
       cost: parsedCost, 
       quantity: itemQuantity, 
       shop: selectedShop.trim(),
-      image: itemImage 
+      image: itemImage,
+      instructions: category === 'Food' ? instructions.trim() : undefined
     });
     setItemName('');
     setItemCost('');
     setItemQuantity(1);
     setSelectedShop('');
     setItemImage(null);
+    setInstructions('');
+    setCategory('Grocery & Essentials');
+    setIsCategoryOpen(false);
+    setIsListening(false);
+    pan.setValue({ x: 0, y: 0 });
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     
     setShowSuccessAnim(true);
     setTimeout(() => setShowSuccessAnim(false), 2500);
@@ -135,6 +144,7 @@ export default function NewRequestScreen() {
 
         {/* Scrollable Content Area */}
         <ScrollView
+          ref={scrollViewRef}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -258,6 +268,19 @@ export default function NewRequestScreen() {
                     <Text style={styles.removeImageText}>Remove Photo</Text>
                   </TouchableOpacity>
                 )}
+              </View>
+            )}
+
+            {category === 'Food' && (
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Specific Instructions</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="e.g. Extra spicy, no onions"
+                  placeholderTextColor={colors.textSecondary}
+                  value={instructions}
+                  onChangeText={setInstructions}
+                />
               </View>
             )}
 

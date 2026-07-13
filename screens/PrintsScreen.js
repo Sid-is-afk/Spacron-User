@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -21,6 +21,7 @@ export default function PrintsScreen() {
   const { handleAddItem: addCartItem } = useCart();
   const { colors } = useTheme();
   const styles = createStyles(colors);
+  const scrollViewRef = useRef(null);
 
   const [selectedShop, setSelectedShop] = useState('');
   const [itemQuantity, setItemQuantity] = useState(1);
@@ -61,6 +62,8 @@ export default function PrintsScreen() {
       setSelectedShop('');
       setPrintType('Black & White');
       setInstructions('');
+      setIsPrintTypeOpen(false);
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
       
       setShowSuccessAnim(true);
       setTimeout(() => setShowSuccessAnim(false), 2500);
@@ -82,6 +85,7 @@ export default function PrintsScreen() {
 
         {/* Scrollable Content Area */}
         <ScrollView
+          ref={scrollViewRef}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
