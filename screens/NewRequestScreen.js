@@ -185,59 +185,63 @@ export default function NewRequestScreen() {
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Quantity</Text>
-              <View style={styles.stepperContainer}>
-                <TouchableOpacity
-                  style={styles.stepperButton}
-                  onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
-                >
-                  <MaterialIcons name="remove" size={20} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <Text style={styles.stepperValue}>{itemQuantity}</Text>
-                <TouchableOpacity
-                  style={styles.stepperButton}
-                  onPress={() => setItemQuantity(itemQuantity + 1)}
-                >
-                  <MaterialIcons name="add" size={20} color={colors.textPrimary} />
-                </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', zIndex: 10 }}>
+              <View style={[styles.inputGroup, { marginRight: 16 }]}>
+                <Text style={styles.label}>Quantity</Text>
+                <View style={styles.stepperContainer}>
+                  <TouchableOpacity
+                    style={styles.stepperButton}
+                    onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
+                  >
+                    <MaterialIcons name="remove" size={20} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                  <Text style={[styles.stepperValue, { paddingHorizontal: 12, minWidth: 32 }]}>{itemQuantity}</Text>
+                  <TouchableOpacity
+                    style={styles.stepperButton}
+                    onPress={() => setItemQuantity(itemQuantity + 1)}
+                  >
+                    <MaterialIcons name="add" size={20} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={[styles.inputGroup, { flex: 1, zIndex: 10 }]}>
+                <Text style={styles.label}>Category</Text>
+                <View style={{ zIndex: 10 }}>
+                  <TouchableOpacity
+                    style={styles.dropdownButton}
+                    onPress={() => setIsCategoryOpen(!isCategoryOpen)}
+                  >
+                    <Text style={[styles.dropdownText, { flex: 1 }]} numberOfLines={1}>{category}</Text>
+                    <MaterialIcons name={isCategoryOpen ? "expand-less" : "expand-more"} size={24} color={colors.iconInactive} />
+                  </TouchableOpacity>
+
+                  {isCategoryOpen && (
+                    <View style={[styles.dropdownMenu, { position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100 }]}>
+                      {categories.map((item) => (
+                        <TouchableOpacity
+                          key={item}
+                          style={styles.dropdownMenuItem}
+                          onPress={() => {
+                            setCategory(item);
+                            setIsCategoryOpen(false);
+                          }}
+                        >
+                          <Text style={[
+                            styles.dropdownMenuItemText,
+                            category === item && styles.dropdownMenuItemTextActive
+                          ]}>
+                            {item}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
 
             <View style={styles.divider} />
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Category</Text>
-              <TouchableOpacity
-                style={styles.dropdownButton}
-                onPress={() => setIsCategoryOpen(!isCategoryOpen)}
-              >
-                <Text style={styles.dropdownText}>{category}</Text>
-                <MaterialIcons name={isCategoryOpen ? "expand-less" : "expand-more"} size={24} color={colors.iconInactive} />
-              </TouchableOpacity>
-
-              {isCategoryOpen && (
-                <View style={styles.dropdownMenu}>
-                  {categories.map((item) => (
-                    <TouchableOpacity
-                      key={item}
-                      style={styles.dropdownMenuItem}
-                      onPress={() => {
-                        setCategory(item);
-                        setIsCategoryOpen(false);
-                      }}
-                    >
-                      <Text style={[
-                        styles.dropdownMenuItemText,
-                        category === item && styles.dropdownMenuItemTextActive
-                      ]}>
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
 
             {category === 'Medicines' && (
               <View style={styles.inputGroup}>
