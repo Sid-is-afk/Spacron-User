@@ -93,25 +93,33 @@ export default function NewRequestScreen() {
   };
 
   const handleAddItem = () => {
-    if (itemName.trim() && itemCost.trim() && itemQuantity > 0 && selectedShop.trim()) {
-      addCartItem({ 
-        name: itemName.trim(), 
-        cost: parseFloat(itemCost) || 0, 
-        quantity: itemQuantity, 
-        shop: selectedShop.trim(),
-        image: itemImage 
-      });
-      setItemName('');
-      setItemCost('');
-      setItemQuantity(1);
-      setSelectedShop('');
-      setItemImage(null);
-      
-      setShowSuccessAnim(true);
-      setTimeout(() => setShowSuccessAnim(false), 2500);
-    } else {
+    const parsedCost = parseFloat(itemCost);
+
+    if (!itemName.trim() || !itemCost.trim() || itemQuantity <= 0 || !selectedShop.trim()) {
       alert('Please fill out all required fields, including the Preferred Shop.');
+      return;
     }
+
+    if (isNaN(parsedCost) || parsedCost <= 0) {
+      alert('Cost must be a positive value greater than 0.');
+      return;
+    }
+
+    addCartItem({ 
+      name: itemName.trim(), 
+      cost: parsedCost, 
+      quantity: itemQuantity, 
+      shop: selectedShop.trim(),
+      image: itemImage 
+    });
+    setItemName('');
+    setItemCost('');
+    setItemQuantity(1);
+    setSelectedShop('');
+    setItemImage(null);
+    
+    setShowSuccessAnim(true);
+    setTimeout(() => setShowSuccessAnim(false), 2500);
   };
 
   return (
@@ -169,7 +177,10 @@ export default function NewRequestScreen() {
                 placeholder="e.g. 50"
                 placeholderTextColor={colors.textSecondary}
                 value={itemCost}
-                onChangeText={setItemCost}
+                onChangeText={(text) => {
+                  const formattedText = text.replace(/[^0-9.]/g, '');
+                  setItemCost(formattedText);
+                }}
                 keyboardType="numeric"
               />
             </View>
