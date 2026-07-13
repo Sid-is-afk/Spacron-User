@@ -24,6 +24,7 @@ const TabNavigator = () => {
         sceneContainerStyle={{ flex: 1, backgroundColor: colors.background }}
         screenOptions={({ route }) => ({
           headerShown: false,
+          animation: 'shift',
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
