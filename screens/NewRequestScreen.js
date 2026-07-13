@@ -39,7 +39,6 @@ export default function NewRequestScreen() {
   const pulseAnim = useRef(new Animated.Value(0.3)).current;
   const [itemImage, setItemImage] = useState(null);
   const [showSuccessAnim, setShowSuccessAnim] = useState(false);
-  const [isListening, setIsListening] = useState(false);
 
   const pan = useRef(new Animated.ValueXY()).current;
   const panResponder = useRef(
@@ -87,11 +86,7 @@ export default function NewRequestScreen() {
   };
 
   const simulateVoiceToText = () => {
-    setIsListening(true);
-    setTimeout(() => {
-      setItemName("1 packet of Maggi");
-      setIsListening(false);
-    }, 2000);
+    alert("Voice to text is coming soon!");
   };
 
   const handleAddItem = () => {
@@ -123,7 +118,6 @@ export default function NewRequestScreen() {
     setInstructions('');
     setCategory('Grocery & Essentials');
     setIsCategoryOpen(false);
-    setIsListening(false);
     pan.setValue({ x: 0, y: 0 });
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     
@@ -162,8 +156,8 @@ export default function NewRequestScreen() {
               <View style={styles.textInputWithIcon}>
                 <TextInput
                   style={[styles.textInput, { flex: 1, borderWidth: 0 }]}
-                  placeholder={isListening ? "Listening..." : "e.g. 1 packet of Maggi"}
-                  placeholderTextColor={isListening ? colors.primary : colors.textSecondary}
+                  placeholder="e.g. 1 packet of Maggi"
+                  placeholderTextColor={colors.textSecondary}
                   value={itemName}
                   onChangeText={setItemName}
                 />
@@ -171,7 +165,7 @@ export default function NewRequestScreen() {
                   <MaterialIcons 
                     name="mic" 
                     size={24} 
-                    color={isListening ? colors.danger : colors.textSecondary} 
+                    color={colors.textSecondary} 
                   />
                 </TouchableOpacity>
               </View>
