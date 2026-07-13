@@ -24,6 +24,9 @@ export default function PrintsScreen() {
   const [selectedShop, setSelectedShop] = useState('');
   const [itemQuantity, setItemQuantity] = useState(1);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [printType, setPrintType] = useState('Black & White');
+  const [isPrintTypeOpen, setIsPrintTypeOpen] = useState(false);
+  const [instructions, setInstructions] = useState('');
 
   const pickDocument = async () => {
     try {
@@ -41,17 +44,21 @@ export default function PrintsScreen() {
   };
 
   const handleAddItem = () => {
+    const costPerCopy = printType === 'Color' ? 5 : 2;
     if (selectedFile && itemQuantity > 0 && selectedShop.trim()) {
       addCartItem({
         name: selectedFile.name,
-        cost: 0,
+        cost: costPerCopy,
         quantity: itemQuantity,
         shop: selectedShop.trim(),
-        category: 'Printout'
+        category: 'Printout',
+        instructions: instructions.trim()
       });
       setSelectedFile(null);
       setItemQuantity(1);
       setSelectedShop('');
+      setPrintType('Black & White');
+      setInstructions('');
     } else {
       alert('Please fill out all required fields, including uploading a document and Preferred Shop.');
     }
@@ -98,26 +105,74 @@ export default function PrintsScreen() {
 
 
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Number of Copies</Text>
-              <View style={styles.stepperContainer}>
-                <TouchableOpacity
-                  style={styles.stepperButton}
-                  onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
-                >
-                  <MaterialIcons name="remove" size={20} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <Text style={styles.stepperValue}>{itemQuantity}</Text>
-                <TouchableOpacity
-                  style={styles.stepperButton}
-                  onPress={() => setItemQuantity(itemQuantity + 1)}
-                >
-                  <MaterialIcons name="add" size={20} color={colors.textPrimary} />
-                </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', zIndex: 10 }}>
+              <View style={[styles.inputGroup, { marginRight: 16 }]}>
+                <Text style={styles.label}>Number of Copies</Text>
+                <View style={styles.stepperContainer}>
+                  <TouchableOpacity
+                    style={styles.stepperButton}
+                    onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
+                  >
+                    <MaterialIcons name="remove" size={20} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                  <Text style={[styles.stepperValue, { paddingHorizontal: 12, minWidth: 32 }]}>{itemQuantity}</Text>
+                  <TouchableOpacity
+                    style={styles.stepperButton}
+                    onPress={() => setItemQuantity(itemQuantity + 1)}
+                  >
+                    <MaterialIcons name="add" size={20} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={[styles.inputGroup, { flex: 1, zIndex: 10 }]}>
+                <Text style={styles.label}>Print Type</Text>
+                <View style={{ zIndex: 10 }}>
+                  <TouchableOpacity
+                    style={styles.dropdownButton}
+                    onPress={() => setIsPrintTypeOpen(!isPrintTypeOpen)}
+                  >
+                    <Text style={[styles.dropdownText, { flex: 1 }]} numberOfLines={1}>{printType}</Text>
+                    <MaterialIcons name={isPrintTypeOpen ? "expand-less" : "expand-more"} size={24} color={colors.iconInactive} />
+                  </TouchableOpacity>
+
+                  {isPrintTypeOpen && (
+                    <View style={[styles.dropdownMenu, { position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100 }]}>
+                      {['Black & White', 'Color'].map((item) => (
+                        <TouchableOpacity
+                          key={item}
+                          style={styles.dropdownMenuItem}
+                          onPress={() => {
+                            setPrintType(item);
+                            setIsPrintTypeOpen(false);
+                          }}
+                        >
+                          <Text style={[
+                            styles.dropdownMenuItemText,
+                            printType === item && styles.dropdownMenuItemTextActive
+                          ]}>
+                            {item}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
 
             <View style={styles.divider} />
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Specific Instructions</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g. Print on both sides"
+                placeholderTextColor={colors.textSecondary}
+                value={instructions}
+                onChangeText={setInstructions}
+              />
+            </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Preferred Shop</Text>
@@ -272,6 +327,48 @@ const createStyles = (colors) => StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
+  },
+  dropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  dropdownText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+  dropdownMenu: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    marginTop: 8,
+    paddingVertical: 8,
+    shadowColor: colors.textPrimary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  dropdownMenuItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  dropdownMenuItemText: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  dropdownMenuItemTextActive: {
+    fontFamily: 'PlusJakartaSans_600SemiBold',
+    color: colors.primary,
   },
   uploadButton: {
     flexDirection: 'row',

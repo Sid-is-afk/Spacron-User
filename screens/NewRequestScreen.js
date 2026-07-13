@@ -316,15 +316,12 @@ export default function NewRequestScreen() {
                 <Text style={styles.mapSelectButtonText}>Set Exact Location</Text>
               </TouchableOpacity>
             </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
+              <Text style={styles.addButtonText}>Add to Cart</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
-
-        {/* Floating Glassmorphic Add Button */}
-        <BlurView intensity={80} tint="light" style={styles.floatingGlassContainer}>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
-            <Text style={styles.addButtonText}>Add to Cart</Text>
-          </TouchableOpacity>
-        </BlurView>
 
         {/* Lottie Success Animation Overlay */}
         {showSuccessAnim && (
@@ -470,15 +467,16 @@ const createStyles = (colors) => StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   addButton: {
-    backgroundColor: 'rgba(76, 175, 80, 0.85)', // Slight transparency for the button itself
-    paddingVertical: 16,
+    backgroundColor: colors.primaryLight,
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 8,
   },
   addButtonText: {
     fontFamily: 'PlusJakartaSans_600SemiBold',
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 14,
+    color: colors.primary,
   },
   lottieOverlay: {
     ...StyleSheet.absoluteFillObject,
