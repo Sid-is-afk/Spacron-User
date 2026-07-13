@@ -45,6 +45,9 @@ export default function CartScreen() {
                     <View style={styles.cartItemInfo}>
                       <Text style={styles.cartItemName}>{item.name}</Text>
                       <Text style={styles.cartItemShop}>Store: {item.shop || 'Any Store'}</Text>
+                      {item.instructions ? (
+                        <Text style={styles.cartItemInstructions}>Instructions: {item.instructions}</Text>
+                      ) : null}
                       <Text style={styles.cartItemCost}>₹{item.cost * (item.quantity || 1)}</Text>
                     </View>
                     
@@ -191,6 +194,13 @@ const createStyles = (colors) => StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
     marginBottom: 4,
+  },
+  cartItemInstructions: {
+    fontFamily: 'PlusJakartaSans_400Regular',
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 4,
+    fontStyle: 'italic',
   },
   cartItemCost: {
     fontFamily: 'PlusJakartaSans_500Medium',
