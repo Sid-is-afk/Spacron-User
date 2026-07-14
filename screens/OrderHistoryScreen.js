@@ -17,24 +17,7 @@ export default function OrderHistoryScreen() {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
-  const mockOrders = [
-    {
-      id: '1',
-      date: '10 July 2026, 14:30',
-      status: 'On the Way',
-      items: '1x Milk, 2x Bread',
-      total: '₹120',
-      timelineIndex: 3,
-    },
-    {
-      id: '2',
-      date: '08 July 2026, 10:15',
-      status: 'Delivered',
-      items: '1x Paracetamol, 1x Water Bottle',
-      total: '₹80',
-      timelineIndex: 4,
-    }
-  ];
+  const mockOrders = [];
 
   const timelineSteps = ['Placed', 'Accepted', 'Shopping', 'On the Way', 'Delivered'];
 
