@@ -11,59 +11,74 @@ import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import CartScreen from './screens/CartScreen';
 import PrintsScreen from './screens/PrintsScreen';
+import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
 import { CartProvider } from './context/CartContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 const TabNavigator = () => {
   const { colors } = useTheme();
   return (
+    <Tab.Navigator
+      sceneContainerStyle={{ flex: 1, backgroundColor: colors.background }}
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        animation: 'shift',
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'New Request') {
+            iconName = 'add-circle-outline';
+          } else if (route.name === 'Prints') {
+            iconName = 'print';
+          } else if (route.name === 'Cart') {
+            iconName = 'shopping-cart';
+          } else if (route.name === 'Order History') {
+            iconName = 'history';
+          } else if (route.name === 'Profile') {
+            iconName = 'person';
+          }
+
+          return <MaterialIcons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.iconInactive,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          paddingBottom: 4,
+          paddingTop: 4,
+          height: 60,
+        },
+        tabBarLabelStyle: {
+          fontFamily: 'PlusJakartaSans_500Medium',
+          fontSize: 12,
+        },
+      })}
+    >
+      <Tab.Screen name="New Request" component={NewRequestScreen} options={{ tabBarLabel: 'Requests' }} />
+      <Tab.Screen name="Prints" component={PrintsScreen} />
+      <Tab.Screen name="Cart" component={CartScreen} />
+      <Tab.Screen name="Order History" component={OrderHistoryScreen} options={{ tabBarLabel: 'History' }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
+  );
+};
+
+const AppNavigator = () => {
+  const { colors } = useTheme();
+  return (
     <NavigationContainer>
-      <Tab.Navigator
-        sceneContainerStyle={{ flex: 1, backgroundColor: colors.background }}
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          animation: 'shift',
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-
-            if (route.name === 'New Request') {
-              iconName = 'add-circle-outline';
-            } else if (route.name === 'Prints') {
-              iconName = 'print';
-            } else if (route.name === 'Cart') {
-              iconName = 'shopping-cart';
-            } else if (route.name === 'Order History') {
-              iconName = 'history';
-            } else if (route.name === 'Profile') {
-              iconName = 'person';
-            }
-
-            return <MaterialIcons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: colors.primary,
-          tabBarInactiveTintColor: colors.iconInactive,
-          tabBarStyle: {
-            backgroundColor: colors.surface,
-            borderTopWidth: 1,
-            borderTopColor: colors.border,
-            paddingBottom: 4,
-            paddingTop: 4,
-            height: 60,
-          },
-          tabBarLabelStyle: {
-            fontFamily: 'PlusJakartaSans_500Medium',
-            fontSize: 12,
-          },
-        })}
-      >
-        <Tab.Screen name="New Request" component={NewRequestScreen} options={{ tabBarLabel: 'Requests' }} />
-        <Tab.Screen name="Prints" component={PrintsScreen} />
-        <Tab.Screen name="Cart" component={CartScreen} />
-        <Tab.Screen name="Order History" component={OrderHistoryScreen} options={{ tabBarLabel: 'History' }} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="MainApp" component={TabNavigator} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
@@ -90,7 +105,7 @@ export default function App() {
     <SafeAreaProvider style={styles.appContainer}>
       <ThemeProvider>
         <CartProvider>
-          <TabNavigator />
+          <AppNavigator />
         </CartProvider>
       </ThemeProvider>
     </SafeAreaProvider>
