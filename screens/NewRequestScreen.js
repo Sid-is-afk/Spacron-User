@@ -102,10 +102,10 @@ export default function NewRequestScreen() {
       return;
     }
 
-    addCartItem({ 
-      name: itemName.trim(), 
-      cost: parsedCost, 
-      quantity: itemQuantity, 
+    addCartItem({
+      name: itemName.trim(),
+      cost: parsedCost,
+      quantity: itemQuantity,
       shop: selectedShop.trim(),
       image: itemImage,
       instructions: category === 'Food' ? instructions.trim() : undefined
@@ -120,7 +120,7 @@ export default function NewRequestScreen() {
     setIsCategoryOpen(false);
     pan.setValue({ x: 0, y: 0 });
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-    
+
     setShowSuccessAnim(true);
     setTimeout(() => setShowSuccessAnim(false), 2500);
   };
@@ -162,10 +162,10 @@ export default function NewRequestScreen() {
                   onChangeText={setItemName}
                 />
                 <TouchableOpacity onPress={simulateVoiceToText} style={styles.micButton}>
-                  <MaterialIcons 
-                    name="mic" 
-                    size={24} 
-                    color={colors.textSecondary} 
+                  <MaterialIcons
+                    name="mic"
+                    size={24}
+                    color={colors.textSecondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -270,7 +270,7 @@ export default function NewRequestScreen() {
                 <Text style={styles.label}>Specific Instructions</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="e.g. Extra spicy, no onions"
+                  placeholder="e.g. Half Plate or Full Plate"
                   placeholderTextColor={colors.textSecondary}
                   value={instructions}
                   onChangeText={setInstructions}
@@ -314,12 +314,12 @@ export default function NewRequestScreen() {
                   </View>
                 )}
                 {/* Center Pin Overlay (Draggable) */}
-                <Animated.View 
+                <Animated.View
                   style={[
-                    styles.mapOverlay, 
+                    styles.mapOverlay,
                     { transform: [{ translateX: pan.x }, { translateY: pan.y }] },
                     { opacity: isMapLoaded || Platform.OS !== 'web' ? 1 : 0 }
-                  ]} 
+                  ]}
                   {...panResponder.panHandlers}
                 >
                   <MaterialIcons name="location-pin" size={40} color={colors.danger} style={styles.mapPin} />
