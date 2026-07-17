@@ -6,18 +6,31 @@ This is the prototype for the **Spacron User** application, built using React Na
 
 ```mermaid
 graph TD
+    subgraph Context
+        Theme[ThemeProvider]
+        CartCtx[CartProvider]
+    end
+
     subgraph Spacron User App
         App[App Entry Point - App.js]
-        Nav[React Navigation - Bottom Tabs]
+        StackNav[React Navigation - Native Stack]
+        TabNav[React Navigation - Bottom Tabs]
         
-        subgraph Screens
+        subgraph Auth Screens
+            Login[LoginScreen]
+            Register[RegisterScreen]
+        end
+        
+        subgraph Main Screens
             NewReq[NewRequestScreen]
+            Prints[PrintsScreen]
+            Cart[CartScreen]
             History[OrderHistoryScreen]
             Profile[ProfileScreen]
         end
         
         subgraph New Request Features
-            Cart[Itemized Cart System]
+            CartSys[Itemized Cart System]
             Pricing[Dynamic Total Calculation]
             Map[Interactive Location Picker]
         end
@@ -28,12 +41,21 @@ graph TD
         end
     end
 
-    App -->|Initializes Fonts & SafeArea| Nav
-    Nav -->|Tab 1| NewReq
-    Nav -->|Tab 2| History
-    Nav -->|Tab 3| Profile
+    App -->|Wraps with| Theme
+    Theme -->|Wraps with| CartCtx
+    CartCtx -->|Initializes| StackNav
+    
+    StackNav -->|Auth Flow| Login
+    StackNav -->|Auth Flow| Register
+    StackNav -->|Main App| TabNav
+    
+    TabNav -->|Tab 1| NewReq
+    TabNav -->|Tab 2| Prints
+    TabNav -->|Tab 3| Cart
+    TabNav -->|Tab 4| History
+    TabNav -->|Tab 5| Profile
 
-    NewReq --> Cart
+    NewReq --> CartSys
     NewReq --> Pricing
     NewReq --> Map
 
